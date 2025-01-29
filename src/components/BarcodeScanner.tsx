@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import { Barcode, Camera, CameraOff, Loader2 } from 'lucide-react';
+import { Barcode, Camera, CameraOff } from 'lucide-react';
 
 interface BarcodeScannerProps {
   onResult: (result: string) => void;
@@ -8,14 +8,37 @@ interface BarcodeScannerProps {
 
 export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onResult }) => {
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 1;
+    }
+
+    const handleOrientationChange = () => {
+      setIsLandscape(window.matchMedia("(orientation: landscape)").matches);
+    };
+
+    handleOrientationChange(); // Set initial orientation
+    window.addEventListener("resize", handleOrientationChange);
+
+    return () => {
+      window.removeEventListener("resize", handleOrientationChange);
+    };
+  }, []);
 
   const handleStartStop = async () => {
+    if(isEnabled) {
+      onResult('');
+    }
     setIsEnabled(prev => !prev);
   };
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-900">
+      <audio ref={audioRef} src="beep.mp3" style={{ display: 'none' }} />
+      <div className={`relative aspect-square rounded-lg overflow-hidden bg-gray-900 ${isLandscape ? 'rotate-90' : ''}`}>
         {isEnabled ? (
           <BarcodeScannerComponent
             width={1280}
@@ -24,18 +47,15 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onResult }) => {
               if (result) {
                 onResult(result.text);
                 setIsEnabled(false);
+                if (audioRef.current) {
+                  audioRef.current.play();
+                }
               }
             }}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
             <Barcode className="w-16 h-16 text-gray-600" />
-          </div>
-        )}
-
-        {isEnabled && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <Loader2 className="w-8 h-8 text-white animate-spin" />
           </div>
         )}
 
