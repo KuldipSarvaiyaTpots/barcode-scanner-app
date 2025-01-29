@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import { Barcode, Camera, CameraOff } from 'lucide-react';
+import { Barcode, Camera, CameraOff, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface BarcodeScannerProps {
   onResult: (result: string) => void;
@@ -56,12 +56,6 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onResult }) => {
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
             <Barcode className="w-16 h-16 text-gray-600" />
-          </div>
-        )}
-
-        {isEnabled && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-64 h-64 border-2 border-white/50 rounded-lg"></div>
           </div>
         )}
       </div>
