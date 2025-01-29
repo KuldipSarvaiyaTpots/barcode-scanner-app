@@ -17,28 +17,48 @@ export const Scanner: React.FC<ScannerProps> = ({ scannerRef, onDetected, zoom }
             type: 'LiveStream',
             target: scannerRef.current,
             constraints: {
-              width: 1280,
-              height: 720,
+              width: { min: 1280, ideal: 1920 },
+              height: { min: 720, ideal: 1080 },
               facingMode: 'environment',
+              aspectRatio: { min: 1, max: 2 },
             },
             area: {
-              top: "25%",
-              right: "25%",
-              left: "25%",
-              bottom: "25%",
+              top: "0%",
+              right: "0%",
+              left: "0%",
+              bottom: "0%",
             },
           },
           locate: true,
           numOfWorkers: navigator.hardwareConcurrency || 4,
           decoder: {
-            readers: ['ean_reader', 'ean_8_reader', 'code_128_reader', 'code_39_reader', 'upc_reader'],
+            readers: [
+              'ean_reader',
+              'ean_8_reader',
+              'code_128_reader',
+              'code_39_reader',
+              'upc_reader',
+              'upc_e_reader',
+              'codabar_reader',
+              'i2of5_reader'
+            ],
             debug: {
               drawBoundingBox: true,
               showFrequency: true,
               drawScanline: true,
               showPattern: true
-            }
+            },
+            multiple: false
           },
+          locator: {
+            patchSize: "large",
+            halfSample: true,
+            debug: {
+              showCanvas: true,
+              showPatches: true,
+              showFoundPatches: true
+            }
+          }
         },
         (err) => {
           if (err) {
@@ -70,7 +90,7 @@ export const Scanner: React.FC<ScannerProps> = ({ scannerRef, onDetected, zoom }
     }
   }, [scannerRef, onDetected]);
 
-  // Handle zoom changes separately
+  // Handle zoom changes
   useEffect(() => {
     const track = Quagga.CameraAccess.getActiveTrack();
     if (track && typeof track.getCapabilities === 'function') {

@@ -36,9 +36,9 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onResult }) => {
   const handleZoom = (direction: 'in' | 'out') => {
     setZoom(prev => {
       if (direction === 'in' && prev < 5) {
-        return Math.min(5, prev + 0.1);
+        return Math.min(5, prev + 0.2);
       } else if (direction === 'out' && prev > 1) {
-        return Math.max(1, prev - 0.1);
+        return Math.max(1, prev - 0.2);
       }
       return prev;
     });
